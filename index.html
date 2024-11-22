@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <style>
+        * {
+            box-sizing: border-box;   margin: 0;
+          padding: 0;
+        }
+
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;  min-height: 100vh;
+            background: #000;
+      color: white;
+        display: flex;justify-content: center;
+            align-items: center;position: relative;
+      overflow: hidden;
+  padding: 20px;
+        }
+
+
+
+        .background {  position: fixed;
+            top: 0;   left: 0;
+            right: 0; bottom: 0;
+            z-index: -1;
+        }
+
+        .gradient {
+            width: 100%;height: 100%;
+            background: linear-gradient(45deg, #ff0066, #6600ff, #00ffcc);
+          filter: blur(100px);
+            opacity: 0.3;
+        animation: gradient 15s ease infinite;
+    background-size: 400% 400%;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+         50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glass-card {
+         background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+            border-radius: 16px;
+              border: 1px solid rgba(255, 255, 255, 0.2);
+         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .glass-button {
+            background: rgba(255, 255, 255, 0.1);
+           
+            backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);  padding: 12px 24px; border-radius: 8px;
+         color: white; font-weight: 500;
+       cursor: pointer; transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.2); transform: translateY(-2px);
+        }
+
+
+        .glass-button.danger {
+            background: rgba(255, 0, 0, 0.1); border-color: rgba(255, 0, 0, 0.2);
+        }
+
+
+        .glass-button.danger:hover {
+            background: rgba(255, 0, 0, 0.2);
+        }
+
+        .glass-input {
+    background: rgba(255, 255, 255, 0.1);  backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);padding: 12px;
+            border-radius: 8px; color: white;
+     width: 100%;   min-width: 0;
+        }
+
+        .glass-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .container {
+     width: 100%; max-width: 600px; min-height: calc(100vh - 40px);
+            display: flex;flex-direction: column;
+        }
+
+        .home-screen, .chat-room {
+            display: none;
+     height: calc(100vh - 40px);
+        }
+
+
+
+.chat-room { display: none;   flex-direction: column;
+        }
+
+     .active {
+     display: flex;
+            flex-direction: column;
+        }
+
+     .join-container {   display: flex;
+     gap: 12px;  margin: 20px 0;
+        }
+
+ .chat-container {
+        flex: 1;
+            overflow-y: auto; margin: 15px 0;
+            padding: 10px;  min-height: 0; 
+      max-height: calc(100vh - 250px); 
+        }
+     .message {background: rgba(255, 255, 255, 0.05);
+          padding: 12px;
+            border-radius: 8px; margin: 8px 0;
+     word-wrap: break-word;
+        }
+
+.code-display { font-size: 20px;
+            font-weight: bold;  text-align: center;  margin: 10px 0;padding: 15px;
+        }
+.notification {
+            position: fixed;top: 20px;right: 20px;
+    transform: translateX(150%);
+            transition: transform 0.3s ease;z-index: 1000;
+        }
+
+.notification.show {
+            transform: translateX(0);
+        }
+
+ .notification-content {
+            background: rgba(255, 255, 255, 0.1);  
+         backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+ padding: 16px 24px;
+            border-radius: 8px;  color: white;  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+
+
+
+        }
+
+
+        h1 {
+            text-align: center; 
+                    margin-bottom: 20px;
+                     font-size: 24px;
+        
+        }
+
+        .message-input-container { margin-top: auto;
+           
+                   padding-top: 10px;
+        }
+
+        #adminControls {text-align: center;
+            margin: 10px 0;
+        }
+
+      
+        @media (max-width: 480px) { body {
+                padding: 10px;
+            }
+      
+                .container { min-height: calc(100vh - 20px);
+            }
+ 
+         
+    .glass-card { padding: 15px;
+            }
+
+
+            .chat-container {
+                max-height: calc(100vh - 220px);
+            }
+  .glass-button {   padding: 10px 20px;
+                font-size: 14px;
+            }
+
+          
+  .code-display {font-size: 16px;
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+   margin-bottom: 15px;
+            }
+
+            .join-container {
+            margin: 15px 0;
+                 gap: 8px;
+            }
+
+    .glass-input {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {   background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);border-radius: 3px;
+        }
+        .chat-container::-webkit-scrollbar-thumb:hover {  background: rgba(255, 255, 255, 0.3);
+        }
+
+        .para{
+           text-align: center;
+            color: rgb(116, 116, 136);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background">
+<div class="gradient"></div>
+    </div>
+
+    <div class="notification" id="notification">
+<div class="notification-content">
+ <p id="notification-message"></p>
+ </div>
+</div>
+
+    <div class="container">
+    <div class="home-screen active glass-card"> <h1>Welcome to Cameo Sky</h1><p class="para">We save no data</p><p class="para">contact me at greycameosky@gmail.com</p>  
+<br> <button class="glass-button" id="createRoomBtn">Create Room</button>
+ <div class="join-container">     <input type="text" class="glass-input" id="roomCode" placeholder="Enter 6-digit room code">
+     <button class="glass-button" id="joinRoomBtn">Join Room</button>
+            
+    </div>
+        </div>
+  <div class="chat-room glass-card">
+      <div class="code-display glass-card" id="roomCodeDisplay"></div>
+     <div id="adminControls">
+         
+           <button class="glass-button danger" id="disposeRoomBtn">Dispose Group</button>
+            </div>
+   <div class="chat-container glass-card" id="messages"></div>
+      <div class="message-input-container join-container">   <input type="text" class="glass-input" id="messageInput" placeholder="Type your message"> 
+        <button class="glass-button" id="sendMessageBtn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+           import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
+           import { getDatabase, ref, set, get, push, onValue, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyABL6Bv5e5b-z2-8xfdRbpo-EW6cGobbd4",
+            authDomain: "disposablechat-1.firebaseapp.com",
+            databaseURL: "https://disposablechat-1-default-rtdb.firebaseio.com",
+            projectId: "disposablechat-1",
+            storageBucket: "disposablechat-1.firebasestorage.app",
+            messagingSenderId: "691428489070",
+            appId: "1:691428489070:web:9acd05ec69a98ee083b37f",
+            measurementId: "G-RLHN8YNCH7"
+        };
+const app = initializeApp(firebaseConfig);const analytics = getAnalytics(app);const database = getDatabase(app);
+let currentRoom = null;let currentUser = null;
+ function showNotification(message, duration = 3000) {const notification = document.getElementById('notification');
+const messageEl = document.getElementById('notification-message');
+messageEl.textContent = message;
+            notification.classList.add('show'); setTimeout(() => {    notification.classList.remove('show');}, duration);
+        }
+  function generateRoomCode() {
+         
+    return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+function displayMessage(message) {
+            const messagesDiv = document.getElementById('messages');
+    const messageElement = document.createElement('div');
+            messageElement.className = 'message';messageElement.innerHTML = `<strong>${message.sender}:</strong> ${message.text}`;
+    messagesDiv.appendChild(messageElement); messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function showChatRoom(roomCode, isAdmin) {
+    document.querySelector('.home-screen').classList.remove('active');  document.querySelector('.chat-room').classList.add('active');
+  document.getElementById('roomCodeDisplay').textContent = `Room Code: ${roomCode}`;       
+    document.getElementById('adminControls').style.display = isAdmin ? 'block' : 'none';
+            const messagesRef = ref(database, 'rooms/' + roomCode + '/messages');
+ onValue(messagesRef, (snapshot) => {
+                const messagesDiv = document.getElementById('messages');
+     messagesDiv.innerHTML = '';
+                
+  if (snapshot.exists()) {
+                    const messages = snapshot.val();
+       Object.values(messages).forEach(message => {
+                        displayMessage(message);
+                    });
+                }
+            });
+
+      const roomRef = ref(database, 'rooms/' + roomCode);
+ onValue(roomRef, (snapshot) => {
+
+                if (!snapshot.exists() && currentRoom) {
+                    if (currentUser !== 'admin') {   showNotification('This room has been closed by the admin');          setTimeout(() => {
+                      
+                        window.location.reload();
+                        }, 1500);
+                    }
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => { document.getElementById('createRoomBtn').addEventListener('click', async () => {
+                const roomCode = generateRoomCode();currentRoom = roomCode; currentUser = 'admin';
+
+      try {
+        await set(ref(database, 'rooms/' + roomCode), {      admin: true,
+                        members: 1,
+                    }); showChatRoom(roomCode, true);
+       showNotification('Room created successfully!');
+                } catch (error) {
+                    console.error("Error creating room:", error);
+          showNotification('Error creating room. Please try again.');  }  });
+            document.getElementById('joinRoomBtn').addEventListener('click', async () => { const roomCode = document.getElementById('roomCode').value; if (roomCode.length !== 6) {
+showNotification('Please enter a valid 6-digit room code');    return;
+                }
+                try {
+const snapshot = await get(ref(database, 'rooms/' + roomCode));
+if (snapshot.exists()) {
+                        const roomData = snapshot.val(); currentRoom = roomCode; currentUser = 'person' + roomData.members;
+            await set(ref(database, 'rooms/' + roomCode + '/members'), roomData.members + 1);
+    showChatRoom(roomCode, false);
+        showNotification('Joined room successfully!');
+                 
+                 
+                    } else {
+                      
+                  showNotification('Room does not exist');
+                    }
+        } catch (error) {
+                    console.error("Error joining room:", error); showNotification('Error joining room. Please try again.');
+                }
+            });
+document.getElementById('sendMessageBtn').addEventListener('click', async () => {
+                const messageInput = document.getElementById('messageInput');
+                const message = messageInput.value.trim();
+                
+                if (message && currentRoom) { const messageData = {
+                        text: message,       sender: currentUser,      timestamp: Date.now()
+                    };
+
+                    try {  await push(ref(database, 'rooms/' + currentRoom + '/messages'), messageData);messageInput.value = '';} catch (error) {
+                        console.error("Error sending message:", error);showNotification('Error sending message. Please try again.'); } }
+            }); document.getElementById('disposeRoomBtn').addEventListener('click', async () => {
+                if (currentUser === 'admin' && currentRoom) {
+   try {     await remove(ref(database, 'rooms/' + currentRoom));
+          showNotification('Room disposed successfully');
+              setTimeout(() => {
+          window.location.reload();
+           }, 1500);
+                    } catch (error) {   console.error("Error disposing room:", error);
+ showNotification('Error disposing room. Please try again.');
+     }
+      }
+    });
+            document.getElementById('messageInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {    document.getElementById('sendMessageBtn').click();
+                }
+            });
+            document.getElementById('roomCode').addEventListener('keypress', function(e) {  if (e.key === 'Enter') {
+    document.getElementById('joinRoomBtn').click();           }
+            });
+        });
+    </script>
+</body>
+</html>
